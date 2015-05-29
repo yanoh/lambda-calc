@@ -199,7 +199,8 @@ auto SIEVE_OF_ERATOSTHENES = Z([](auto f) {
                      (a)
                      ([=](auto x) {
                          return f(SIEVE(TAIL(l))(HEAD(l)))
-                                 (PUSH(a)(HEAD(l)))
+                                 //(PUSH(a)(HEAD(l)))
+                                 (UNSHIFT(a)(HEAD(l)))
                                  (x);
                      });
         };
@@ -214,112 +215,110 @@ auto PRIME_NUMBERS_UPTO = [](auto n) {
 
 namespace helpers
 {
-    auto print_number = [](auto n) {
+    template <typename T> void print_number(T n, bool nl = true)
+    {
         std::cout << n([](auto x) { return x + 1; })(0);
-    };
+        if (nl) std::cout << std::endl;
+    }
 
-    auto print_number_pair = [](auto p) {
+    template <typename T> void print_number_pair(T p, bool nl = true)
+    {
         std::cout << "(";
-        print_number(CAR(p));
+        print_number(CAR(p), false);
         std::cout << " . ";
-        print_number(CDR(p));
+        print_number(CDR(p), false);
         std::cout << ")";
-    };
+        if (nl) std::cout << std::endl;
+    }
 
-    auto print_number_list_aux = [](auto l) {
-        (IF(EMPTYP(l))
-           ([=](auto) {})
-           ([=](auto) {
-               print_number(HEAD(l));
-               (IF(EMPTYP(TAIL(l)))
-                  ([]() {})
-                  ([=]() { std::cout << " "; }))();
-               print_number_list_aux(TAIL(l));
-           })
-        )(ZERO);
-    };
-
-    auto print_number_list = [](auto l) {
+    template <typename T> void print_number_list(T l, bool nl = true)
+    {
+        auto iter = Z([](auto f) {
+            return [=](auto l) {
+                return IF(EMPTYP(l))
+                         (ZERO)
+                         ([=](auto x) {
+                             print_number(HEAD(l), false);
+                             IF(EMPTYP(TAIL(l)))
+                               (ZERO)
+                               ([](auto) {
+                                   std::cout << " ";
+                                   return ZERO;
+                               })(x);
+                             return f(TAIL(l))(x);
+                         });
+            };
+        });
         std::cout << "(";
-        print_number_list_aux(l);
+        iter(l)(ZERO);
         std::cout << ")";
-    };
+        if (nl) std::cout << std::endl;
+    }
+
+    template <typename T> void print_number_list_r(T l, bool nl = true)
+    {
+        auto iter = Z([](auto f) {
+            return [=](auto l) {
+                return IF(EMPTYP(l))
+                         (ZERO)
+                         ([=](auto x) {
+                             f(TAIL(l))(x);
+                             IF(EMPTYP(TAIL(l)))
+                               (ZERO)
+                               ([](auto) {
+                                   std::cout << " ";
+                                   return ZERO;
+                               })(x);
+                             print_number(HEAD(l), false);
+                             return ZERO;
+                         });
+            };
+        });
+        std::cout << "(";
+        iter(l)(ZERO);
+        std::cout << ")";
+        if (nl) std::cout << std::endl;
+    }
 }
 
 int main()
 {
-    helpers::print_number_list(PRIME_NUMBERS_UPTO(ADD(TWENTY)(TEN)));
-    std::cout << std::endl;
+    helpers::print_number_list_r(PRIME_NUMBERS_UPTO(TWENTY));
 
     /*
     helpers::print_number_list(SIEVE(RANGE(TWO)(HUNDRED))(TWO));
-    std::cout << std::endl;
 
     helpers::print_number(ONE);
-    std::cout << std::endl;
-
     helpers::print_number(TWO);
-    std::cout << std::endl;
-
     helpers::print_number(THREE);
-    std::cout << std::endl;
 
     helpers::print_number(ADD(ONE)(THREE));
-    std::cout << std::endl;
 
     helpers::print_number(IF(ZEROP(ZERO))(ONE)(ZERO));
-    std::cout << std::endl;
-
     helpers::print_number(IF(ZEROP(FOUR))(ONE)(ZERO));
-    std::cout << std::endl;
 
     helpers::print_number_pair(CONS(ONE)(TWO));
-    std::cout << std::endl;
-
-    auto list = UNSHIFT(UNSHIFT(UNSHIFT(EMPTY)(THREE))(TWO))(ONE);
-    helpers::print_number_list(list);
-    std::cout << std::endl;
+    helpers::print_number_list(UNSHIFT(UNSHIFT(UNSHIFT(EMPTY)(THREE))(TWO))(ONE));
 
     helpers::print_number(DEC(THREE));
-    std::cout << std::endl;
-
     helpers::print_number(SUB(ADD(TWO)(THREE))(FOUR));
-    std::cout << std::endl;
-
     helpers::print_number(SUB(ADD(TWO)(THREE))(ONE));
-    std::cout << std::endl;
-
     helpers::print_number(DIV(FIVE)(TWO));
-    std::cout << std::endl;
-
     helpers::print_number(DIV(TEN)(THREE));
-    std::cout << std::endl;
-
     helpers::print_number(MOD(FOUR)(TWO));
-    std::cout << std::endl;
-
     helpers::print_number(MOD(TEN)(THREE));
-    std::cout << std::endl;
 
     helpers::print_number_list(RANGE(ZERO)(THREE));
-    std::cout << std::endl;
-
     helpers::print_number(REDUCE(RANGE(ZERO)(THREE))(ZERO)(ADD));
-    std::cout << std::endl;
-
     helpers::print_number_list(MAP(RANGE(ZERO)(THREE))(MUL(TWO)));
-    std::cout << std::endl;
 
     helpers::print_number_list(
         SELECT(RANGE(ONE)(TWENTY))
               ([](auto n) { return ZEROP(MOD(n)(TWO)); })
     );
-    std::cout << std::endl;
-
     helpers::print_number_list(
         REJECT(RANGE(ONE)(TWENTY))
               ([](auto n) { return ZEROP(MOD(n)(TWO)); })
     );
-    std::cout << std::endl;
     */
 }
