@@ -284,41 +284,16 @@ namespace helpers
 int main()
 {
     helpers::print_number_list_r(PRIME_NUMBERS_UPTO(TWENTY));
-
-    /*
-    helpers::print_number_list(SIEVE(RANGE(TWO)(HUNDRED))(TWO));
-
-    helpers::print_number(ONE);
-    helpers::print_number(TWO);
-    helpers::print_number(THREE);
-
-    helpers::print_number(ADD(ONE)(THREE));
-
-    helpers::print_number(IF(ZEROP(ZERO))(ONE)(ZERO));
-    helpers::print_number(IF(ZEROP(FOUR))(ONE)(ZERO));
-
-    helpers::print_number_pair(CONS(ONE)(TWO));
-    helpers::print_number_list(UNSHIFT(UNSHIFT(UNSHIFT(EMPTY)(THREE))(TWO))(ONE));
-
-    helpers::print_number(DEC(THREE));
-    helpers::print_number(SUB(ADD(TWO)(THREE))(FOUR));
-    helpers::print_number(SUB(ADD(TWO)(THREE))(ONE));
-    helpers::print_number(DIV(FIVE)(TWO));
-    helpers::print_number(DIV(TEN)(THREE));
-    helpers::print_number(MOD(FOUR)(TWO));
-    helpers::print_number(MOD(TEN)(THREE));
-
-    helpers::print_number_list(RANGE(ZERO)(THREE));
-    helpers::print_number(REDUCE(RANGE(ZERO)(THREE))(ZERO)(ADD));
-    helpers::print_number_list(MAP(RANGE(ZERO)(THREE))(MUL(TWO)));
-
-    helpers::print_number_list(
-        SELECT(RANGE(ONE)(TWENTY))
-              ([](auto n) { return ZEROP(MOD(n)(TWO)); })
-    );
-    helpers::print_number_list(
-        REJECT(RANGE(ONE)(TWENTY))
-              ([](auto n) { return ZEROP(MOD(n)(TWO)); })
-    );
-    */
 }
+
+/*
+ % g++ --version
+ g++ (GCC) 5.1.0
+ Copyright (C) 2015 Free Software Foundation, Inc.
+ This is free software; see the source for copying conditions.  There is NO
+ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ 
+ % g++ -Wall -pedantic -std=c++14 lambda-calc.cc
+ % ./a.out
+ (2 3 5 7 11 13 17 19)
+*/
