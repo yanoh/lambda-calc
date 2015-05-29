@@ -50,10 +50,9 @@ auto THREE     = INC(TWO);
 auto FOUR      = INC(THREE);
 auto FIVE      = INC(FOUR);
 
-auto TEN       = MUL(FIVE)(TWO);
-auto TWENTY    = MUL(TEN)(TWO);
-auto FIFTY     = ADD(MUL(TWENTY)(TWO))(TEN);
-auto HUNDRED   = MUL(TWENTY)(FIVE);
+auto TEN       = ADD(FIVE)(FIVE);
+auto TWENTY    = ADD(TEN)(TEN);
+auto FORTY     = ADD(TWENTY)(TWENTY);
 
 auto TRUE = [](auto x) {
     return [=](auto y) {
@@ -135,42 +134,42 @@ auto REDUCE = Z([](auto f) {
                 return IF(EMPTYP(l))
                          (x)
                          ([=](auto y) {
-                             return g(f(TAIL(l))(x)(g))
-                                     (HEAD(l))
-                                     (y);
+                             return f(TAIL(l))
+                                     (g(x)(HEAD(l)))
+                                     (g)(y);
                          });
             };
         };
     };
 });
 
-auto PUSH = [](auto l) {
-    return [=](auto x) {
-        return REDUCE(l)(UNSHIFT(EMPTY)(x))(UNSHIFT);
-    };
+auto REVERSE = [](auto l) {
+    return REDUCE(l)(EMPTY)(UNSHIFT);
 };
 
 auto MAP = [](auto l) {
     return [=](auto f) {
-        return REDUCE(l)(EMPTY)
-                     ([=](auto a) {
-                         return [=](auto x) {
-                             return UNSHIFT(a)(f(x));
-                         };
-                     });
+        return REVERSE(
+                 REDUCE(l)(EMPTY)
+                       ([=](auto a) {
+                           return [=](auto x) {
+                               return UNSHIFT(a)(f(x));
+                           };
+                       }));
     };
 };
 
 auto SELECT = [](auto l) {
     return [=](auto p) {
-        return REDUCE(l)(EMPTY)
-                     ([=](auto a) {
-                         return [=](auto x) {
-                             return IF(p(x))
-                                      (UNSHIFT(a)(x))
-                                      (a);
-                         };
-                     });
+        return REVERSE(
+                 REDUCE(l)(EMPTY)
+                       ([=](auto a) {
+                           return [=](auto x) {
+                               return IF(p(x))
+                                        (UNSHIFT(a)(x))
+                                        (a);
+                           };
+                       }));
     };
 };
 
@@ -199,7 +198,6 @@ auto SIEVE_OF_ERATOSTHENES = Z([](auto f) {
                      (a)
                      ([=](auto x) {
                          return f(SIEVE(TAIL(l))(HEAD(l)))
-                                 //(PUSH(a)(HEAD(l)))
                                  (UNSHIFT(a)(HEAD(l)))
                                  (x);
                      });
@@ -208,7 +206,7 @@ auto SIEVE_OF_ERATOSTHENES = Z([](auto f) {
 });
 
 auto PRIME_NUMBERS_UPTO = [](auto n) {
-    return SIEVE_OF_ERATOSTHENES(RANGE(TWO)(n))(EMPTY);
+    return REVERSE(SIEVE_OF_ERATOSTHENES(RANGE(TWO)(n))(EMPTY));
 };
 
 #include <iostream>
@@ -254,36 +252,11 @@ namespace helpers
         std::cout << ")";
         if (nl) std::cout << std::endl;
     }
-
-    template <typename T> void print_number_list_r(T l, bool nl = true)
-    {
-        auto iter = Z([](auto f) {
-            return [=](auto l) {
-                return IF(EMPTYP(l))
-                         (ZERO)
-                         ([=](auto x) {
-                             f(TAIL(l))(x);
-                             IF(EMPTYP(TAIL(l)))
-                               (ZERO)
-                               ([](auto) {
-                                   std::cout << " ";
-                                   return ZERO;
-                               })(x);
-                             print_number(HEAD(l), false);
-                             return ZERO;
-                         });
-            };
-        });
-        std::cout << "(";
-        iter(l)(ZERO);
-        std::cout << ")";
-        if (nl) std::cout << std::endl;
-    }
 }
 
 int main()
 {
-    helpers::print_number_list_r(PRIME_NUMBERS_UPTO(TWENTY));
+    helpers::print_number_list(PRIME_NUMBERS_UPTO(FORTY));
 }
 
 /*
@@ -295,5 +268,5 @@ int main()
  
  % g++ -Wall -pedantic -std=c++14 lambda-calc.cc
  % ./a.out
- (2 3 5 7 11 13 17 19)
+ (2 3 5 7 11 13 17 19 23 29 31 37)
 */
